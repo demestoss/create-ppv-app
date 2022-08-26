@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { Command } from "commander";
 import { AppLogger } from "./logger";
 import { AppCli } from "./cli";
