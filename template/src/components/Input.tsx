@@ -7,8 +7,6 @@ namespace Input {
   }
 }
 
-// Luck of customizing the input component.
-// But for now we have only one type of input, so it's okay :)
 const Input: FC<Input.Props> = ({ value, onChange }) => {
   return (
     <input
