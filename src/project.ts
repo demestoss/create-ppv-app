@@ -41,14 +41,19 @@ class Project {
     await fs.copy(this.srcDir, this.dir);
     await fs.rename(path.join(this.dir, "_gitignore"), path.join(this.dir, ".gitignore"));
 
-    await execAsync(`${this.packageManager} install`, { cwd: this.dir });
-
     this.spinner.succeed(`${chalk.cyan.bold(this.name)} creating successfully completed!`);
   }
 
   async updatePackages() {
     const pkgJsonService = new PackageJsonService(this.logger, this.spinner, this.dir);
     await pkgJsonService.updatePackages();
+    await this.runPackageInstall();
+  }
+
+  async runPackageInstall() {
+    this.spinner.start(`Running ${chalk.cyan.bold(this.packageManager + " install")}...`);
+    await execAsync(`${this.packageManager} install`, { cwd: this.dir });
+    this.spinner.succeed(`Packages successfully installed!`);
   }
 
   async initGit() {
