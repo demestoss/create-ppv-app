@@ -1,5 +1,5 @@
 import inquirer from "inquirer";
-import type { ProjectOptions, PackageManager } from "./index";
+import type { ProjectOptions, PackageManager, CliOptions } from "./index";
 import path from "path";
 
 interface Cli {
@@ -9,9 +9,11 @@ interface Cli {
 class AppCli implements Cli {
   private readonly name: NameOption;
   private readonly packageManager: PackageManagerOption;
+  private readonly noGit: boolean;
 
-  constructor(args: string[]) {
-    this.name = new NameOption(args[0]);
+  constructor(options: CliOptions) {
+    this.name = new NameOption(options.name);
+    this.noGit = options.noGit;
     this.packageManager = new PackageManagerOption();
   }
 
@@ -19,8 +21,9 @@ class AppCli implements Cli {
     const name = await this.name.proceed();
     const packageManager = await this.packageManager.proceed();
     const dir = path.resolve(process.cwd(), name);
+    const git = !this.noGit;
 
-    return { name, dir, packageManager };
+    return { name, dir, packageManager, git };
   }
 }
 

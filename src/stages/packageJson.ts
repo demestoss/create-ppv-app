@@ -1,9 +1,9 @@
 import { type PackageJson } from "type-fest";
 import fs from "fs-extra";
 import path from "path";
-import { execAsync } from "./execAsync";
-import type { Logger } from "./logger";
-import type { Spinner } from "./spinner";
+import { execAsync } from "../execAsync";
+import type { Logger } from "../logger";
+import type { Spinner } from "../spinner";
 
 class PackageJsonService {
   private pkgJson!: PackageJson;

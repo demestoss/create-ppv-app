@@ -1,7 +1,7 @@
 import chalk from "chalk";
-import { execAsync } from "./execAsync";
-import type { Logger } from "./logger";
-import type { Spinner } from "./spinner";
+import { execAsync } from "../execAsync";
+import type { Logger } from "../logger";
+import type { Spinner } from "../spinner";
 
 class Git {
   constructor(

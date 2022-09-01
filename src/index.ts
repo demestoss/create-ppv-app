@@ -10,7 +10,13 @@ export type PackageManager = "npm" | "pnpm" | "yarn";
 export interface ProjectOptions {
   name: string;
   dir: string;
+  git: boolean;
   packageManager: PackageManager;
+}
+
+export interface CliOptions {
+  name: string;
+  noGit: boolean;
 }
 
 const logger = new AppLogger();
@@ -22,12 +28,14 @@ const main = async () => {
     .name("create-ppv-app")
     .description("Create web application with a zero config")
     .argument("[name]", "The name of the application")
+    .option("--noGit", "Pass if Git shouldn't be initialized")
     .parse(process.argv);
 
-  const cli = new AppCli(program.args);
-  const options = await cli.proceed();
+  const cliOptions = program.opts<CliOptions>();
+  const cli = new AppCli(cliOptions);
+  const projectOptions = await cli.proceed();
 
-  const project = new Project(logger, spinner, options);
+  const project = new Project(logger, spinner, projectOptions);
   await project.createBaseTemplate();
   await project.updatePackages();
   await project.initGit();
