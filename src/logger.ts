@@ -9,20 +9,25 @@ interface Logger {
 
 class AppLogger implements Logger {
   error(...args: unknown[]) {
-    console.log(chalk.red(...args));
+    this.log(chalk.red(...args));
   }
 
   info(...args: unknown[]) {
-    console.log(chalk.blue(...args));
+    this.log(chalk.blue(...args));
   }
 
   warn(...args: unknown[]) {
-    console.log(chalk.yellow(...args));
+    this.log(chalk.yellow(...args));
   }
 
   success(...args: unknown[]) {
-    console.log(chalk.green(...args));
+    this.log(chalk.green(...args));
+  }
+
+  private log(str: string) {
+    console.log(str);
   }
 }
 
-export { AppLogger, Logger };
+export { AppLogger };
+export type { Logger };

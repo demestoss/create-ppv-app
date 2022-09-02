@@ -5,43 +5,42 @@ import fs from "fs-extra";
 import path from "path";
 import inquirer from "inquirer";
 import { fileURLToPath } from "url";
+import { PackageManager } from "../packageManager";
 
 // @ts-ignore
 const __filename = fileURLToPath(import.meta.url);
 const distPath = path.dirname(__filename);
 export const PKG_ROOT = path.join(distPath, "../");
 
-class BaseTemplate {
-  private readonly srcDir = path.join(PKG_ROOT, "template");
+class Template {
+  private readonly srcDir = path.join(PKG_ROOT, "template/base");
 
   constructor(
     private readonly logger: Logger,
     private readonly spinner: Spinner,
-    private readonly dir: string,
-    private readonly name: string,
-    private readonly packageManager: string
+    private readonly packageManager: PackageManager
   ) {}
 
-  async create() {
-    this.logger.info(`\nUsing manager: ${chalk.cyan.bold(this.packageManager)}\n`);
-    this.spinner.start(`Creating template in: ${this.dir}...`);
+  async create(dir: string, name: string) {
+    this.logger.info(`\nUsing manager: ${chalk.cyan.bold(this.packageManager.name)}\n`);
+    this.spinner.start(`Creating template in: ${dir}...`);
 
-    await this.checkIfExists();
+    await this.checkIfExists(dir, name);
     this.spinner.start();
 
-    await fs.copy(this.srcDir, this.dir);
-    await fs.rename(path.join(this.dir, "_gitignore"), path.join(this.dir, ".gitignore"));
+    await fs.copy(this.srcDir, dir);
+    await fs.rename(path.join(dir, "_gitignore"), path.join(dir, ".gitignore"));
 
-    this.spinner.succeed(`${chalk.cyan.bold(this.name)} creating successfully completed!`);
+    this.spinner.succeed(`${chalk.cyan.bold(name)} creating successfully completed!`);
   }
 
-  private async checkIfExists() {
-    if (!fs.existsSync(this.dir)) {
+  private async checkIfExists(dir: string, name: string) {
+    if (!fs.existsSync(dir)) {
       return;
     }
 
-    if (fs.readdirSync(this.dir).length === 0) {
-      this.spinner.info(`${chalk.cyan.bold(this.name)} exists but is empty, continuing...`);
+    if (fs.readdirSync(dir).length === 0) {
+      this.spinner.info(`${chalk.cyan.bold(name)} exists but is empty, continuing...`);
       return;
     }
 
@@ -51,7 +50,7 @@ class BaseTemplate {
       name: "overwriteDir",
       type: "confirm",
       message: `${chalk.redBright.bold("Warning:")} ${chalk.cyan.bold(
-        this.name
+        name
       )} already exists and isn't empty. Do you want to overwrite it?`,
       default: false,
     });
@@ -60,10 +59,10 @@ class BaseTemplate {
       this.spinner.fail("Aborting installation...");
       process.exit(0);
     } else {
-      this.spinner.info(`Emptying ${chalk.cyan.bold(this.name)} and creating app..`);
-      fs.emptyDirSync(this.dir);
+      this.spinner.info(`Emptying ${chalk.cyan.bold(name)} and creating app..`);
+      fs.emptyDirSync(dir);
     }
   }
 }
 
-export { BaseTemplate };
+export { Template };
