@@ -6,7 +6,7 @@ import { Spinner } from "../spinner";
 import { ProjectSettings } from "../project/projectSettings";
 
 interface Cli {
-  proceed(): Promise<ProjectSettings>;
+  proceed(argv: string[]): Promise<ProjectSettings>;
 }
 
 class AppCli implements Cli {
@@ -14,14 +14,22 @@ class AppCli implements Cli {
   private readonly name: NameProcessor;
   private readonly packageManager: PackageManagerProcessor;
 
-  constructor(private readonly logger: Logger, private readonly spinner: Spinner) {
+  constructor(
+    private readonly logger: Logger,
+    private readonly spinner: Spinner,
+    private readonly env: NodeJS.ProcessEnv
+  ) {
     this.program = new Program();
     this.name = new NameProcessor(this.logger, this.spinner);
-    this.packageManager = new PackageManagerProcessor(this.logger, this.spinner);
+    this.packageManager = new PackageManagerProcessor(
+      this.logger,
+      this.spinner,
+      env.npm_config_user_agent || ""
+    );
   }
 
-  async proceed() {
-    const options = this.program.parse(process.argv);
+  async proceed(argv: string[]) {
+    const options = this.program.parse(argv);
 
     const name = await this.name.proceed(options);
     const packageManager = await this.packageManager.proceed();

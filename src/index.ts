@@ -10,8 +10,8 @@ const spinner = new AppSpinner();
 const main = async () => {
   console.log("Welcome to create-ppv app!");
 
-  const cli = new AppCli(logger, spinner);
-  const projectSettings = await cli.proceed();
+  const cli = new AppCli(logger, spinner, process.env);
+  const projectSettings = await cli.proceed(process.argv);
 
   const project = new Project(logger, spinner, projectSettings);
   await project.createBaseTemplate();

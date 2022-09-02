@@ -29,16 +29,14 @@ interface CliProcessor<TValue = any> {
 }
 
 abstract class BaseCliProcessor<TValue> implements CliProcessor<TValue> {
-  protected abstract defaultValue: TValue;
-
   constructor(protected readonly logger: Logger, protected readonly spinner: Spinner) {}
 
   abstract proceed(options: ProgramOptions): Promise<TValue>;
 }
 
 class NameProcessor extends BaseCliProcessor<string> {
-  protected readonly validator = new NameValidator();
-  protected readonly defaultValue = "my-app";
+  private readonly validator = new NameValidator();
+  private readonly defaultValue = "my-app";
 
   async proceed(options: ProgramOptions) {
     if (this.isPassedNameValid(options.name)) {
@@ -65,16 +63,21 @@ class NameProcessor extends BaseCliProcessor<string> {
 }
 
 class PackageManagerProcessor extends BaseCliProcessor<PackageManager> {
-  protected readonly defaultValue = new NpmPackageManager(this.logger, this.spinner);
+  constructor(
+    protected readonly logger: Logger,
+    protected readonly spinner: Spinner,
+    private readonly userAgent: string
+  ) {
+    super(logger, spinner);
+  }
 
   async proceed(): Promise<PackageManager> {
-    const userAgent = process.env.npm_config_user_agent;
+    if (this.userAgent?.startsWith("yarn"))
+      return new YarnPackageManager(this.logger, this.spinner);
+    if (this.userAgent?.startsWith("pnpm"))
+      return new PnpmPackageManager(this.logger, this.spinner);
 
-    if (userAgent?.startsWith("npm")) return new NpmPackageManager(this.logger, this.spinner);
-    if (userAgent?.startsWith("yarn")) return new YarnPackageManager(this.logger, this.spinner);
-    if (userAgent?.startsWith("pnpm")) return new PnpmPackageManager(this.logger, this.spinner);
-
-    return this.defaultValue;
+    return new NpmPackageManager(this.logger, this.spinner);
   }
 }
 

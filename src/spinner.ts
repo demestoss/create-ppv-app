@@ -1,4 +1,4 @@
-import ora, { Ora, PersistOptions } from "ora";
+import ora, { PersistOptions } from "ora";
 
 interface Spinner {
   start(text?: string): this;
@@ -53,4 +53,5 @@ class AppSpinner implements Spinner {
   }
 }
 
-export { AppSpinner, Spinner };
+export { AppSpinner };
+export type { Spinner };

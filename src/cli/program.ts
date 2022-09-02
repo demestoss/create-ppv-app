@@ -20,7 +20,12 @@ class Program {
 
   parse(argv: string[]): ProgramOptions {
     this.program.parse(argv);
-    return this.program.opts<ProgramOptions>();
+    const options = this.program.opts<ProgramOptions>();
+
+    return {
+      ...options,
+      name: options?.name || this.program.args[0],
+    };
   }
 }
 
