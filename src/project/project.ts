@@ -24,7 +24,8 @@ class Project {
   }
 
   async runPackageInstall() {
-    this.settings.packageManager.copyLockFile(this.settings.dir);
+    await this.settings.packageManager.copyLockFile(this.settings.dir);
+
     if (!this.settings.install) {
       return;
     }

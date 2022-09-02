@@ -10,13 +10,14 @@ interface PackageManager {
   name: string;
   install(dir: string): Promise<void>;
   logGuide(projectName: string): void;
-  copyLockFile(dir: string): void;
+  copyLockFile(dir: string): Promise<void>;
 }
 
 abstract class BasePackageManager implements PackageManager {
   protected readonly lockDir = path.join(PKG_ROOT, "template/packageManager");
 
   name: string = "";
+  protected lockFile: string = "";
   protected installed: boolean = false;
 
   constructor(protected readonly logger: Logger, protected readonly spinner: Spinner) {}
@@ -36,48 +37,41 @@ abstract class BasePackageManager implements PackageManager {
     }
   }
 
-  abstract copyLockFile(dir: string): void;
+  async copyLockFile(dir: string) {
+    await fs.copy(path.join(this.lockDir, this.lockFile), path.join(dir, this.lockFile));
+  }
 }
 
 class NpmPackageManager extends BasePackageManager {
   name = "npm";
+  lockFile = "package-lock.json";
 
   logGuide(projectName: string) {
     super.logGuide(projectName);
 
     this.logger.info(`  ${this.name} run dev`);
   }
-
-  copyLockFile(dir: string) {
-    fs.copySync(`${this.lockDir}/package-lock.json`, dir);
-  }
 }
 
 class YarnPackageManager extends BasePackageManager {
   name = "yarn";
+  lockFile = "yarn.lock";
 
   logGuide(projectName: string) {
     super.logGuide(projectName);
 
     this.logger.info(`  ${this.name} dev`);
-  }
-
-  copyLockFile(dir: string) {
-    fs.copySync(`${this.lockDir}/yarn.lock`, dir);
   }
 }
 
 class PnpmPackageManager extends BasePackageManager {
   name = "pnpm";
+  lockFile = "pnpm-lock.yaml";
 
   logGuide(projectName: string) {
     super.logGuide(projectName);
 
     this.logger.info(`  ${this.name} dev`);
-  }
-
-  copyLockFile(dir: string) {
-    fs.copySync(`${this.lockDir}/pnpm-lock.yaml`, dir);
   }
 }
 
