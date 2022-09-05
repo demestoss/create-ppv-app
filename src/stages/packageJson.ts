@@ -1,7 +1,7 @@
 import { type PackageJson } from "type-fest";
 import fs from "fs-extra";
 import path from "path";
-import { utils } from "../utils";
+import { execAsync } from "../utils";
 import type { Logger } from "../logger";
 import type { Spinner } from "../spinner";
 
@@ -24,8 +24,7 @@ class PackageJsonService {
       return;
     }
 
-    await this.updateDependencies();
-    await this.updateDevDependencies();
+    await Promise.all([this.updateDependencies(), this.updateDevDependencies()]);
     await this.writePkgJson();
 
     this.spinner.succeed(`Packages update successfully completed!`);
@@ -48,25 +47,46 @@ class PackageJsonService {
   }
 
   private async update(dependencies: PackageJson.Dependency) {
-    for (const pkgName of Object.keys(dependencies)) {
-      if (pkgName === "") {
-        continue;
-      }
-
-      const { stdout: latestVersion } = await utils(`npm show ${pkgName} version`);
-      if (!latestVersion) {
-        this.logger.warn("WARN: Failed to resolve latest version of package:", pkgName);
-        continue;
-      }
-
-      dependencies[pkgName] = `^${latestVersion.trim()}`;
-    }
+    const updates = await Promise.all(
+      Object.entries(dependencies).map((dep) =>
+        new DependencyService(this.logger, dep[0], dep[1]).update()
+      )
+    );
+    updates.map(([name, version]) => {
+      dependencies[name] = version;
+    });
   }
 
   private async writePkgJson() {
     await fs.writeJSON(path.join(this.dir, "package.json"), this.pkgJson, {
       spaces: 2,
     });
+  }
+}
+
+class DependencyService {
+  constructor(
+    private readonly logger: Logger,
+    private readonly name: string,
+    private version: string
+  ) {}
+
+  async update(): Promise<[string, string]> {
+    await this.updateVersion();
+    return [this.name, this.version];
+  }
+
+  private async updateVersion() {
+    if (!this.name) {
+      return;
+    }
+
+    const { stdout: latestVersion } = await execAsync(`npm show ${this.name} version`);
+    if (!latestVersion) {
+      this.logger.warn("WARN: Failed to resolve latest version of package:", this.name);
+    } else {
+      this.version = `^${latestVersion.trim()}`;
+    }
   }
 }
 

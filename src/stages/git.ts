@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { utils } from "../utils";
+import { execAsync } from "../utils";
 import type { Logger } from "../logger";
 import type { Spinner } from "../spinner";
 

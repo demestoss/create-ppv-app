@@ -1,7 +1,7 @@
 import { Logger } from "./logger";
 import { Spinner } from "./spinner";
 import chalk from "chalk";
-import { utils } from "./utils";
+import { execAsync } from "./utils";
 import path from "path";
 import { PKG_ROOT } from "./stages/template";
 import fs from "fs-extra";
@@ -24,7 +24,7 @@ abstract class BasePackageManager implements PackageManager {
 
   async install(dir: string) {
     this.spinner.start(`Running ${chalk.cyan.bold(this.name + " install")}...`);
-    await utils(`${this.name} install`, { cwd: dir });
+    await execAsync(`${this.name} install`, { cwd: dir });
     this.spinner.succeed(`Packages successfully installed!`);
     this.installed = true;
   }
