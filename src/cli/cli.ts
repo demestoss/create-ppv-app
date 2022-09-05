@@ -1,31 +1,24 @@
+import { inject, injectable } from "tsyringe";
 import path from "path";
 import { Program } from "./program";
 import { NameProcessor, PackageManagerProcessor } from "./processor";
-import { Logger } from "../logger";
-import { Spinner } from "../spinner";
-import { ProjectSettings } from "../project/projectSettings";
+import type { Environment } from "../environment";
+import { PpvProjectSettings, ProjectSettings } from "../project/projectSettings";
 
 interface Cli {
   proceed(argv: string[]): Promise<ProjectSettings>;
 }
 
+@injectable()
 class AppCli implements Cli {
   private readonly program: Program;
   private readonly name: NameProcessor;
   private readonly packageManager: PackageManagerProcessor;
 
-  constructor(
-    private readonly logger: Logger,
-    private readonly spinner: Spinner,
-    private readonly env: NodeJS.ProcessEnv
-  ) {
+  constructor(@inject("Environment") private readonly env: Environment) {
     this.program = new Program();
-    this.name = new NameProcessor(this.logger, this.spinner);
-    this.packageManager = new PackageManagerProcessor(
-      this.logger,
-      this.spinner,
-      env.npm_config_user_agent || ""
-    );
+    this.name = new NameProcessor();
+    this.packageManager = new PackageManagerProcessor(this.env.userAgent);
   }
 
   async proceed(argv: string[]) {
@@ -37,7 +30,7 @@ class AppCli implements Cli {
     const git = !options.noGit;
     const install = !options.noInstall;
 
-    return new ProjectSettings(name, dir, git, install, packageManager);
+    return new PpvProjectSettings(name, dir, git, install, packageManager);
   }
 }
 

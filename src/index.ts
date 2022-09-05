@@ -1,34 +1,47 @@
 #!/usr/bin/env node
-import { AppLogger } from "./logger";
+import "reflect-metadata";
+import { inject, injectable } from "tsyringe";
+import type { Logger } from "./logger";
 import { AppCli } from "./cli/cli";
 import { Project } from "./project/project";
-import { AppSpinner } from "./spinner";
+import { container } from "./container";
 
-const logger = new AppLogger();
-const spinner = new AppSpinner();
+@injectable()
+class Bootstrap {
+  constructor(@inject("Logger") private readonly logger: Logger) {}
 
-const main = async () => {
-  console.log("Welcome to create-ppv app!");
-
-  const cli = new AppCli(logger, spinner, process.env);
-  const projectSettings = await cli.proceed(process.argv);
-
-  const project = new Project(logger, spinner, projectSettings);
-  await project.createBaseTemplate();
-  await project.updatePackages();
-  await project.initGit();
-  project.logGuide();
-
-  process.exit(0);
-};
-
-main().catch((e) => {
-  logger.error("Aborting installation...");
-  if (e instanceof Error) {
-    logger.error(e);
-  } else {
-    logger.error("An unknown error has occurred");
-    logger.error(e);
+  async main() {
+    try {
+      await this.run();
+    } catch (e) {
+      this.handleError(e);
+    }
   }
-  process.exit(1);
-});
+
+  private async run() {
+    this.logger.success("Welcome to create-ppv app!");
+
+    const cli = container.resolve(AppCli);
+    const projectSettings = await cli.proceed(process.argv);
+    container.register("ProjectSettings", { useValue: projectSettings });
+
+    const project = container.resolve(Project);
+    await project.proceedStages();
+
+    process.exit(0);
+  }
+
+  private handleError(e: unknown) {
+    this.logger.error("Aborting installation...");
+    if (e instanceof Error) {
+      this.logger.error(e);
+    } else {
+      this.logger.error("An unknown error has occurred");
+      this.logger.error(e);
+    }
+
+    process.exit(1);
+  }
+}
+
+container.resolve(Bootstrap).main();

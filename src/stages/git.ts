@@ -1,19 +1,35 @@
 import chalk from "chalk";
-import { utils } from "../utils";
+import { execAsync } from "../utils";
+import { Stage } from "../project/stage";
+import { inject, injectable } from "tsyringe";
 import type { Logger } from "../logger";
 import type { Spinner } from "../spinner";
+import type { ProjectSettings } from "../project/projectSettings";
 
-class Git {
-  constructor(private readonly logger: Logger, private readonly spinner: Spinner) {}
+@injectable()
+class GitStage implements Stage {
+  constructor(
+    @inject("Logger") protected readonly logger: Logger,
+    @inject("Spinner") protected readonly spinner: Spinner,
+    @inject("ProjectSettings") protected readonly settings: ProjectSettings
+  ) {}
 
-  async init(dir: string) {
+  async proceed() {
+    if (!this.settings.git) {
+      return;
+    }
+
+    await this.init();
+  }
+
+  private async init() {
     this.logger.info("Initializing Git...");
     this.spinner.start("Creating a new git repo...");
 
     try {
       let initCmd = "git init --initial-branch=master";
 
-      const { stdout: gitVersionOutput } = await utils("git --version");
+      const { stdout: gitVersionOutput } = await execAsync("git --version");
       const gitVersionTag = gitVersionOutput.split(" ")[2];
       const major = gitVersionTag?.split(".")[0];
       const minor = gitVersionTag?.split(".")[1];
@@ -21,7 +37,7 @@ class Git {
         initCmd = "git init && git branch -m master";
       }
 
-      await utils(initCmd, { cwd: dir });
+      await execAsync(initCmd, { cwd: this.settings.dir });
 
       this.spinner.succeed(`${chalk.green("Successfully initialized")} ${chalk.green.bold("git")}`);
     } catch (error) {
@@ -32,4 +48,4 @@ class Git {
   }
 }
 
-export { Git };
+export { GitStage };

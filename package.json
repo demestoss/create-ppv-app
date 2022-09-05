@@ -1,6 +1,6 @@
 {
   "name": "create-ppv-app",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Create web application with a zero config",
   "license": "MIT",
   "repository": {
@@ -41,7 +41,9 @@
     "eslint-config-next": "^12.2.5",
     "eslint-config-prettier": "^8.5.0",
     "prettier": "^2.7.1",
+    "reflect-metadata": "^0.1.13",
     "tsup": "^6.2.2",
+    "tsyringe": "^4.7.0",
     "typescript": "^4.7.4",
     "vitest": "^0.22.1"
   },
