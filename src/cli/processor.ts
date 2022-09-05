@@ -6,8 +6,6 @@ import {
   PnpmPackageManager,
   YarnPackageManager,
 } from "../packageManager";
-import { Logger } from "../logger";
-import { Spinner } from "../spinner";
 
 interface Validator {
   validate(input: string): string | boolean;
@@ -28,13 +26,7 @@ interface CliProcessor<TValue = any> {
   proceed(options: ProgramOptions): Promise<TValue>;
 }
 
-abstract class BaseCliProcessor<TValue> implements CliProcessor<TValue> {
-  constructor(protected readonly logger: Logger, protected readonly spinner: Spinner) {}
-
-  abstract proceed(options: ProgramOptions): Promise<TValue>;
-}
-
-class NameProcessor extends BaseCliProcessor<string> {
+class NameProcessor implements CliProcessor<string> {
   private readonly validator = new NameValidator();
   private readonly defaultValue = "my-app";
 
@@ -62,22 +54,14 @@ class NameProcessor extends BaseCliProcessor<string> {
   }
 }
 
-class PackageManagerProcessor extends BaseCliProcessor<PackageManager> {
-  constructor(
-    protected readonly logger: Logger,
-    protected readonly spinner: Spinner,
-    private readonly userAgent: string
-  ) {
-    super(logger, spinner);
-  }
+class PackageManagerProcessor implements CliProcessor<PackageManager> {
+  constructor(private readonly userAgent: string) {}
 
   async proceed(): Promise<PackageManager> {
-    if (this.userAgent?.startsWith("yarn"))
-      return new YarnPackageManager(this.logger, this.spinner);
-    if (this.userAgent?.startsWith("pnpm"))
-      return new PnpmPackageManager(this.logger, this.spinner);
+    if (this.userAgent?.startsWith("yarn")) return new YarnPackageManager();
+    if (this.userAgent?.startsWith("pnpm")) return new PnpmPackageManager();
 
-    return new NpmPackageManager(this.logger, this.spinner);
+    return new NpmPackageManager();
   }
 }
 
