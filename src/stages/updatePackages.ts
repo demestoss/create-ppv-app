@@ -1,20 +1,24 @@
 import { type PackageJson } from "type-fest";
 import fs from "fs-extra";
 import path from "path";
+import { inject, injectable } from "tsyringe";
 import { execAsync } from "../utils";
 import type { Logger } from "../logger";
 import type { Spinner } from "../spinner";
+import type { ProjectSettings } from "../project/projectSettings";
+import type { Stage } from "../project/stage";
 
-class PackageJsonService {
+@injectable()
+class UpdatePackagesStage implements Stage {
   private pkgJson!: PackageJson;
 
   constructor(
-    private readonly logger: Logger,
-    private readonly spinner: Spinner,
-    private readonly dir: string
+    @inject("Logger") protected readonly logger: Logger,
+    @inject("Spinner") protected readonly spinner: Spinner,
+    @inject("ProjectSettings") protected readonly settings: ProjectSettings
   ) {}
 
-  async updatePackages() {
+  async proceed() {
     this.logger.info("Starting packages update...");
     this.spinner.start(`Updating packages...`);
 
@@ -31,7 +35,7 @@ class PackageJsonService {
   }
 
   private async parse() {
-    this.pkgJson = (await fs.readJSON(path.join(this.dir, "package.json"))) as PackageJson;
+    this.pkgJson = (await fs.readJSON(path.join(this.settings.dir, "package.json"))) as PackageJson;
   }
 
   private validate(): boolean {
@@ -58,7 +62,7 @@ class PackageJsonService {
   }
 
   private async writePkgJson() {
-    await fs.writeJSON(path.join(this.dir, "package.json"), this.pkgJson, {
+    await fs.writeJSON(path.join(this.settings.dir, "package.json"), this.pkgJson, {
       spaces: 2,
     });
   }
@@ -90,4 +94,4 @@ class DependencyService {
   }
 }
 
-export { PackageJsonService };
+export { UpdatePackagesStage };

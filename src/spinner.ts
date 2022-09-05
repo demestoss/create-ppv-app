@@ -1,4 +1,5 @@
 import ora, { PersistOptions } from "ora";
+import { singleton } from "tsyringe";
 
 interface Spinner {
   start(text?: string): this;
@@ -10,6 +11,7 @@ interface Spinner {
   stopAndPersist(options?: PersistOptions): this;
 }
 
+@singleton()
 class AppSpinner implements Spinner {
   private readonly spinner = ora();
 
