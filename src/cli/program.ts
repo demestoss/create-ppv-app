@@ -6,7 +6,11 @@ interface ProgramOptions {
   noInstall: boolean;
 }
 
-class Program {
+interface Program {
+  parse(argv: string[]): ProgramOptions;
+}
+
+class CommandProgram implements Program {
   private readonly program: Command;
 
   constructor() {
@@ -29,5 +33,5 @@ class Program {
   }
 }
 
-export { Program };
-export type { ProgramOptions };
+export { CommandProgram };
+export type { ProgramOptions, Program };

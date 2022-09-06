@@ -30,5 +30,14 @@ class PnpmPackageManager extends BasePackageManager {
   command = "pnpm dev";
 }
 
-export { NpmPackageManager, PnpmPackageManager, YarnPackageManager };
+class PackageManagerFactory {
+  static build(packageManager: string) {
+    if (packageManager?.startsWith("yarn")) return new YarnPackageManager();
+    if (packageManager?.startsWith("pnpm")) return new PnpmPackageManager();
+
+    return new NpmPackageManager();
+  }
+}
+
+export { PackageManagerFactory };
 export type { PackageManager };

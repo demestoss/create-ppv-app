@@ -6,14 +6,14 @@ import type { Stage } from "../project/stage";
 import type { ProjectSettings } from "../project/projectSettings";
 import type { Logger } from "../logger";
 import type { Spinner } from "../spinner";
-import type { Environment } from "../environment";
+import type { Directory } from "../project/directory";
 
 @injectable()
 class CreateTemplateStage implements Stage {
   constructor(
     @inject("Logger") protected readonly logger: Logger,
     @inject("Spinner") protected readonly spinner: Spinner,
-    @inject("Environment") protected readonly env: Environment,
+    @inject("Directory") protected readonly env: Directory,
     @inject("ProjectSettings") protected readonly settings: ProjectSettings
   ) {}
 

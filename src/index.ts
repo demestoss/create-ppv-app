@@ -5,6 +5,7 @@ import type { Logger } from "./logger";
 import { AppCli } from "./cli/cli";
 import { Project } from "./project/project";
 import { container } from "./container";
+import { PpvProjectSettings } from "./project/projectSettings";
 
 @injectable()
 class Bootstrap {
@@ -22,7 +23,8 @@ class Bootstrap {
     this.logger.success("Welcome to create-ppv app!");
 
     const cli = container.resolve(AppCli);
-    const projectSettings = await cli.proceed(process.argv);
+    const cliOptions = await cli.proceed(process.argv);
+    const projectSettings = new PpvProjectSettings(cliOptions);
     container.register("ProjectSettings", { useValue: projectSettings });
 
     const project = container.resolve(Project);

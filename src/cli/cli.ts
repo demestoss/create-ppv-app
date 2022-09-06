@@ -1,36 +1,33 @@
 import { inject, injectable } from "tsyringe";
-import path from "path";
-import { Program } from "./program";
-import { NameProcessor, PackageManagerProcessor } from "./processor";
-import type { Environment } from "../environment";
-import { PpvProjectSettings, ProjectSettings } from "../project/projectSettings";
+import type { Program } from "./program";
+import { NameProcessor } from "./processor";
+import type { Environment } from "./environment";
+import type { CliOptions } from "../project/projectSettings";
 
 interface Cli {
-  proceed(argv: string[]): Promise<ProjectSettings>;
+  proceed(argv: string[]): Promise<CliOptions>;
 }
 
 @injectable()
 class AppCli implements Cli {
-  private readonly program: Program;
   private readonly name: NameProcessor;
-  private readonly packageManager: PackageManagerProcessor;
 
-  constructor(@inject("Environment") private readonly env: Environment) {
-    this.program = new Program();
+  constructor(
+    @inject("Program") private readonly program: Program,
+    @inject("Environment") private readonly env: Environment
+  ) {
     this.name = new NameProcessor();
-    this.packageManager = new PackageManagerProcessor(this.env.userAgent);
   }
 
-  async proceed(argv: string[]) {
+  async proceed(argv: string[]): Promise<CliOptions> {
     const options = this.program.parse(argv);
 
     const name = await this.name.proceed(options);
-    const packageManager = await this.packageManager.proceed();
-    const dir = path.resolve(process.cwd(), name);
+    const packageManager = this.env.userAgent || "npm";
     const git = !options.noGit;
     const install = !options.noInstall;
 
-    return new PpvProjectSettings(name, dir, git, install, packageManager);
+    return { name, git, install, packageManager };
   }
 }
 

@@ -1,11 +1,5 @@
 import inquirer from "inquirer";
-import { ProgramOptions } from "./program";
-import {
-  NpmPackageManager,
-  PackageManager,
-  PnpmPackageManager,
-  YarnPackageManager,
-} from "../packageManager";
+import type { ProgramOptions } from "./program";
 
 interface Validator {
   validate(input: string): string | boolean;
@@ -54,16 +48,5 @@ class NameProcessor implements CliProcessor<string> {
   }
 }
 
-class PackageManagerProcessor implements CliProcessor<PackageManager> {
-  constructor(private readonly userAgent: string) {}
-
-  async proceed(): Promise<PackageManager> {
-    if (this.userAgent?.startsWith("yarn")) return new YarnPackageManager();
-    if (this.userAgent?.startsWith("pnpm")) return new PnpmPackageManager();
-
-    return new NpmPackageManager();
-  }
-}
-
-export { NameProcessor, PackageManagerProcessor };
+export { NameProcessor };
 export type { CliProcessor };
