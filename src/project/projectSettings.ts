@@ -21,4 +21,4 @@ class PpvProjectSettings implements ProjectSettings {
 }
 
 export { PpvProjectSettings };
-export type { ProjectSettings, CliOptions };
+export type { ProjectSettings };

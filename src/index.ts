@@ -15,14 +15,14 @@ class Bootstrap {
   async main() {
     try {
       await this.run();
+      process.exit(0);
     } catch (e) {
       this.handleError(e);
+      process.exit(1);
     }
   }
 
   private async run() {
-    this.logger.success("Welcome to create-ppv app!");
-
     const cli = container.resolve(AppCli);
     const cliOptions = await cli.proceed(process.argv);
 
@@ -34,8 +34,6 @@ class Bootstrap {
 
     const project = container.resolve(Project);
     await project.proceedStages();
-
-    process.exit(0);
   }
 
   private handleError(e: unknown) {
@@ -46,8 +44,6 @@ class Bootstrap {
       this.logger.error("An unknown error has occurred");
       this.logger.error(e);
     }
-
-    process.exit(1);
   }
 }
 

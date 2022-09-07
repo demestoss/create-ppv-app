@@ -11,7 +11,6 @@ class InstallPackagesStage implements Stage {
   constructor(
     @inject("Logger") private readonly logger: Logger,
     @inject("Spinner") private readonly spinner: Spinner,
-    @inject("Directory") private readonly env: Directory,
     @inject("ProjectSettings") private readonly settings: ProjectSettings
   ) {}
 
