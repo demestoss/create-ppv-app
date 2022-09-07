@@ -5,18 +5,15 @@ import type { Stage } from "../project/stagesProcessor";
 
 @injectable()
 class GuideStage implements Stage {
-  constructor(
-    @inject("Logger") private readonly logger: Logger,
-    @inject("ProjectSettings") private readonly settings: ProjectSettings
-  ) {}
+  constructor(@inject("Logger") private readonly logger: Logger) {}
 
-  async proceed() {
+  async proceed(settings: ProjectSettings) {
     this.logger.info("Next steps:");
-    this.logger.info(`  cd ${this.settings.name}`);
-    if (!this.settings.packageManager.installed) {
-      this.logger.info(`  ${this.settings.name} install`);
+    this.logger.info(`  cd ${settings.name}`);
+    if (!settings.packageManager.installed) {
+      this.logger.info(`  ${settings.name} install`);
     }
-    this.logger.info(`  ${this.settings.packageManager.command}`);
+    this.logger.info(`  ${settings.packageManager.command}`);
   }
 }
 

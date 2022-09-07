@@ -10,15 +10,10 @@ import type { ProjectSettings } from "../project/projectSettings";
 class GitStage implements Stage {
   constructor(
     @inject("Logger") protected readonly logger: Logger,
-    @inject("Spinner") protected readonly spinner: Spinner,
-    @inject("ProjectSettings") protected readonly settings: ProjectSettings
+    @inject("Spinner") protected readonly spinner: Spinner
   ) {}
 
-  async proceed() {
-    await this.init();
-  }
-
-  private async init() {
+  async proceed(settings: ProjectSettings) {
     this.logger.info("Initializing Git...");
     this.spinner.start("Creating a new git repo...");
 
@@ -33,7 +28,7 @@ class GitStage implements Stage {
         initCmd = "git init && git branch -m master";
       }
 
-      await execAsync(initCmd, { cwd: this.settings.dir });
+      await execAsync(initCmd, { cwd: settings.dir });
 
       this.spinner.succeed(`${chalk.green("Successfully initialized")} ${chalk.green.bold("git")}`);
     } catch (error) {

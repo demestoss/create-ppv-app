@@ -1,20 +1,21 @@
 import { injectable, injectAll } from "tsyringe";
+import type { ProjectSettings } from "./projectSettings";
 
 interface Stage {
-  proceed(): Promise<void>;
+  proceed(settings: ProjectSettings): Promise<void>;
 }
 
 interface StagesProcessor {
-  proceed(): Promise<void>;
+  proceed(settings: ProjectSettings): Promise<void>;
 }
 
 @injectable()
 class ProjectStagesProcessor implements StagesProcessor {
   constructor(@injectAll("ProjectStage") private readonly stages: Stage[]) {}
 
-  async proceed() {
+  async proceed(settings: ProjectSettings) {
     for await (const stage of this.stages) {
-      await stage.proceed();
+      await stage.proceed(settings);
     }
   }
 }

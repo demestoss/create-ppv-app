@@ -7,24 +7,17 @@ import type { Stage } from "../project/stagesProcessor";
 
 @injectable()
 class CopyLockFileStage implements Stage {
-  constructor(
-    @inject("Directory") private readonly env: Directory,
-    @inject("ProjectSettings") private readonly settings: ProjectSettings
-  ) {}
+  constructor(@inject("Directory") private readonly env: Directory) {}
 
-  async proceed() {
-    await this.copyLockFile();
+  async proceed(settings: ProjectSettings) {
+    await fs.copy(
+      path.join(this.lockDir, settings.packageManager.lockFile),
+      path.join(settings.dir, settings.packageManager.lockFile)
+    );
   }
 
   private get lockDir() {
     return path.join(this.env.packageRoot, "template/packageManager");
-  }
-
-  private async copyLockFile() {
-    await fs.copy(
-      path.join(this.lockDir, this.settings.packageManager.lockFile),
-      path.join(this.settings.dir, this.settings.packageManager.lockFile)
-    );
   }
 }
 

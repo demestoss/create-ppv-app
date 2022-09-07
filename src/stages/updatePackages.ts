@@ -1,4 +1,4 @@
-import { type PackageJson } from "type-fest";
+import type { PackageJson } from "type-fest";
 import fs from "fs-extra";
 import path from "path";
 import { inject, injectable } from "tsyringe";
@@ -14,28 +14,27 @@ class UpdatePackagesStage implements Stage {
 
   constructor(
     @inject("Logger") protected readonly logger: Logger,
-    @inject("Spinner") protected readonly spinner: Spinner,
-    @inject("ProjectSettings") protected readonly settings: ProjectSettings
+    @inject("Spinner") protected readonly spinner: Spinner
   ) {}
 
-  async proceed() {
+  async proceed(settings: ProjectSettings) {
     this.logger.info("Starting packages update...");
     this.spinner.start(`Updating packages...`);
 
-    await this.parse();
+    await this.parse(settings.dir);
     if (!this.validate()) {
       this.spinner.fail("Package update was failed");
       return;
     }
 
     await Promise.all([this.updateDependencies(), this.updateDevDependencies()]);
-    await this.writePkgJson();
+    await this.writePkgJson(settings.dir);
 
     this.spinner.succeed(`Packages update successfully completed!`);
   }
 
-  private async parse() {
-    this.pkgJson = (await fs.readJSON(path.join(this.settings.dir, "package.json"))) as PackageJson;
+  private async parse(dir: string) {
+    this.pkgJson = (await fs.readJSON(path.join(dir, "package.json"))) as PackageJson;
   }
 
   private validate(): boolean {
@@ -61,8 +60,8 @@ class UpdatePackagesStage implements Stage {
     });
   }
 
-  private async writePkgJson() {
-    await fs.writeJSON(path.join(this.settings.dir, "package.json"), this.pkgJson, {
+  private async writePkgJson(dir: string) {
+    await fs.writeJSON(path.join(dir, "package.json"), this.pkgJson, {
       spaces: 2,
     });
   }

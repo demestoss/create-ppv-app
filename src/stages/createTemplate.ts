@@ -3,28 +3,28 @@ import fs from "fs-extra";
 import path from "path";
 import inquirer from "inquirer";
 import type { Stage } from "../project/stagesProcessor";
-import type { ProjectSettings } from "../project/projectSettings";
 import type { Logger } from "../logger";
 import type { Spinner } from "../spinner";
 import type { Directory } from "../project/directory";
+import type { ProjectSettings } from "../project/projectSettings";
 
 @injectable()
 class CreateTemplateStage implements Stage {
+  name: string = "";
+
   constructor(
     @inject("Logger") protected readonly logger: Logger,
     @inject("Spinner") protected readonly spinner: Spinner,
-    @inject("Directory") protected readonly env: Directory,
-    @inject("ProjectSettings") protected readonly settings: ProjectSettings
+    @inject("Directory") protected readonly env: Directory
   ) {}
 
-  async proceed() {
-    this.logger.info(
-      `\nUsing manager: ${this.logger.infoBold(this.settings.packageManager.name)}\n`
-    );
+  async proceed(settings: ProjectSettings) {
+    this.name = settings.name;
+    this.logger.info(`\nUsing manager: ${this.logger.infoBold(settings.packageManager.name)}\n`);
     this.spinner.start(`Creating template in: ${this.formattedName}...`);
 
-    await this.checkIfExists();
-    await this.copyFiles();
+    await this.checkIfExists(settings.dir);
+    await this.copyFiles(settings.dir);
 
     this.spinner.succeed(`${this.formattedName} creating successfully completed!`);
   }
@@ -34,15 +34,15 @@ class CreateTemplateStage implements Stage {
   }
 
   private get formattedName() {
-    return this.logger.infoBold(this.settings.name);
+    return this.logger.infoBold(this.name);
   }
 
-  private async checkIfExists() {
-    if (!fs.existsSync(this.settings.dir)) {
+  private async checkIfExists(dir: string) {
+    if (!fs.existsSync(dir)) {
       return;
     }
 
-    if (fs.readdirSync(this.settings.dir).length === 0) {
+    if (fs.readdirSync(dir).length === 0) {
       this.spinner.info(`${this.formattedName} exists but is empty, continuing...`);
       return;
     }
@@ -63,18 +63,15 @@ class CreateTemplateStage implements Stage {
       process.exit(0);
     } else {
       this.spinner.info(`Emptying ${this.formattedName} and creating app..`);
-      fs.emptyDirSync(this.settings.dir);
+      fs.emptyDirSync(dir);
     }
 
     this.spinner.start();
   }
 
-  private async copyFiles() {
-    await fs.copy(this.srcDir, this.settings.dir);
-    await fs.rename(
-      path.join(this.settings.dir, "_gitignore"),
-      path.join(this.settings.dir, ".gitignore")
-    );
+  private async copyFiles(dir: string) {
+    await fs.copy(this.srcDir, dir);
+    await fs.rename(path.join(dir, "_gitignore"), path.join(dir, ".gitignore"));
   }
 }
 
