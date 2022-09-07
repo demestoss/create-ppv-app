@@ -30,20 +30,5 @@ container.register("Program", {
 });
 
 // Project Stages
-container.register("ProjectStage", {
-  useClass: CreateTemplateStage,
-});
-container.register("ProjectStage", {
-  useClass: UpdatePackagesStage,
-});
-container.register("ProjectStage", {
-  useClass: InstallPackagesStage,
-});
-container.register("ProjectStage", {
-  useClass: GitStage,
-});
-container.register("ProjectStage", {
-  useClass: GuideStage,
-});
 
 export { container };

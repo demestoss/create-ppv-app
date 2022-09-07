@@ -6,6 +6,7 @@ import { AppCli } from "./cli/cli";
 import { Project } from "./project/project";
 import { container } from "./container";
 import { PpvProjectSettings } from "./project/projectSettings";
+import { ProjectStagesRegister } from "./project/projectStagesRegister";
 
 @injectable()
 class Bootstrap {
@@ -24,8 +25,12 @@ class Bootstrap {
 
     const cli = container.resolve(AppCli);
     const cliOptions = await cli.proceed(process.argv);
+
     const projectSettings = new PpvProjectSettings(cliOptions);
     container.register("ProjectSettings", { useValue: projectSettings });
+
+    const projectStagesRegister = new ProjectStagesRegister(container);
+    projectStagesRegister.register(cliOptions);
 
     const project = container.resolve(Project);
     await project.proceedStages();

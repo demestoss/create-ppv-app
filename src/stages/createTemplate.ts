@@ -2,7 +2,7 @@ import { inject, injectable } from "tsyringe";
 import fs from "fs-extra";
 import path from "path";
 import inquirer from "inquirer";
-import type { Stage } from "../project/stage";
+import type { Stage } from "../project/project";
 import type { ProjectSettings } from "../project/projectSettings";
 import type { Logger } from "../logger";
 import type { Spinner } from "../spinner";

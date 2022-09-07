@@ -6,7 +6,7 @@ import { execAsync } from "../utils";
 import type { Logger } from "../logger";
 import type { Spinner } from "../spinner";
 import type { ProjectSettings } from "../project/projectSettings";
-import type { Stage } from "../project/stage";
+import type { Stage } from "../project/project";
 
 @injectable()
 class UpdatePackagesStage implements Stage {

@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { execAsync } from "../utils";
-import { Stage } from "../project/stage";
+import { Stage } from "../project/project";
 import { inject, injectable } from "tsyringe";
 import type { Logger } from "../logger";
 import type { Spinner } from "../spinner";
@@ -15,10 +15,6 @@ class GitStage implements Stage {
   ) {}
 
   async proceed() {
-    if (!this.settings.git) {
-      return;
-    }
-
     await this.init();
   }
 

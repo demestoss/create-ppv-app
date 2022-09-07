@@ -3,6 +3,7 @@ interface PackageManager {
   installed: boolean;
   lockFile: string;
   command: string;
+  install: string;
 }
 
 class BasePackageManager implements PackageManager {
@@ -10,6 +11,12 @@ class BasePackageManager implements PackageManager {
   installed: boolean = false;
   lockFile: string = "";
   command: string = "";
+
+  get install() {
+    // TODO: we need to handle this installation info somewhere else
+    this.installed = true;
+    return `${this.name} install`;
+  }
 }
 
 class NpmPackageManager extends BasePackageManager {

@@ -1,5 +1,15 @@
 import { injectable, injectAll } from "tsyringe";
-import type { Stage } from "./stage";
+
+interface CliOptions {
+  name: string;
+  git: boolean;
+  install: boolean;
+  packageManager: string;
+}
+
+interface Stage {
+  proceed(): Promise<void>;
+}
 
 @injectable()
 class Project {
@@ -13,3 +23,4 @@ class Project {
 }
 
 export { Project };
+export type { Stage, CliOptions };
