@@ -19,12 +19,12 @@ interface Project {
 class PpvProject implements Project {
   constructor(
     @inject("ProjectStagesRegistry") private readonly registry: StagesRegistry,
-    @inject("ProjectSettingsFactory")
-    private readonly projectSettingsFactory: (options: ProjectOptions) => ProjectSettings
+    @inject("ProjectSettingsRegistry")
+    private readonly projectSettingsRegistry: (options: ProjectOptions) => ProjectSettings
   ) {}
 
   async create(options: ProjectOptions) {
-    this.projectSettingsFactory(options);
+    this.projectSettingsRegistry(options);
     this.registry.registerStages(options);
 
     const processor = container.resolve<StagesProcessor>("StagesProcessor");

@@ -41,14 +41,12 @@ container.register("ProjectStagesRegistry", {
     return new ProjectStagesRegistry(dependencyContainer);
   },
 });
-container.register("ProjectSettingsFactory", {
+container.register("ProjectSettingsRegistry", {
   useFactory: (dependencyContainer) => {
     return (options: ProjectOptions) => {
-      const settings = new PpvProjectSettings(options);
       dependencyContainer.register("ProjectSettings", {
-        useValue: settings,
+        useValue: new PpvProjectSettings(options),
       });
-      return settings;
     };
   },
 });
