@@ -1,26 +1,36 @@
-import { injectable, injectAll } from "tsyringe";
+import { inject, injectable } from "tsyringe";
+import { container } from "../container";
+import type { StagesRegistry } from "./projectStagesRegistry";
+import type { StagesProcessor } from "./stagesProcessor";
+import type { ProjectSettings } from "./projectSettings";
 
-interface CliOptions {
+interface ProjectOptions {
   name: string;
   git: boolean;
   install: boolean;
   packageManager: string;
 }
 
-interface Stage {
-  proceed(): Promise<void>;
+interface Project {
+  create(options: ProjectOptions): Promise<void>;
 }
 
 @injectable()
-class Project {
-  constructor(@injectAll("ProjectStage") private readonly stages: Stage[]) {}
+class PpvProject implements Project {
+  constructor(
+    @inject("ProjectStagesRegistry") private readonly registry: StagesRegistry,
+    @inject("ProjectSettingsFactory")
+    private readonly projectSettingsFactory: (options: ProjectOptions) => ProjectSettings
+  ) {}
 
-  async proceedStages() {
-    for await (const stage of this.stages) {
-      await stage.proceed();
-    }
+  async create(options: ProjectOptions) {
+    this.projectSettingsFactory(options);
+    this.registry.registerStages(options);
+
+    const processor = container.resolve<StagesProcessor>("StagesProcessor");
+    await processor.proceed();
   }
 }
 
-export { Project };
-export type { Stage, CliOptions };
+export { PpvProject };
+export type { ProjectOptions, Project };

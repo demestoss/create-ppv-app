@@ -11,7 +11,7 @@ interface Logger {
 }
 
 @singleton()
-class AppLogger implements Logger {
+class ConsoleLogger implements Logger {
   error(...args: unknown[]) {
     this.log(chalk.red(...args));
   }
@@ -41,5 +41,5 @@ class AppLogger implements Logger {
   }
 }
 
-export { AppLogger };
+export { ConsoleLogger };
 export type { Logger };

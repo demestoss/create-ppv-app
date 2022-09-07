@@ -1,18 +1,18 @@
 import { container } from "tsyringe";
-import { AppLogger } from "./logger";
+import { ConsoleLogger } from "./logger";
 import { AppSpinner } from "./spinner";
 import { NodeEnvironment } from "./cli/environment";
-import { GitStage } from "./stages/git";
-import { UpdatePackagesStage } from "./stages/updatePackages";
-import { CreateTemplateStage } from "./stages/createTemplate";
-import { InstallPackagesStage } from "./stages/installPackages";
-import { GuideStage } from "./stages/guide";
 import { CommandProgram } from "./cli/program";
 import { ProjectDirectory } from "./project/directory";
+import { AppCli } from "./cli/cli";
+import { ProjectStagesRegistry } from "./project/projectStagesRegistry";
+import { PpvProject, Project, ProjectOptions } from "./project/project";
+import { ProjectStagesProcessor } from "./project/stagesProcessor";
+import { PpvProjectSettings } from "./project/projectSettings";
 
 // Base Singletons
 container.register("Logger", {
-  useClass: AppLogger,
+  useClass: ConsoleLogger,
 });
 container.register("Spinner", {
   useClass: AppSpinner,
@@ -25,10 +25,35 @@ container.register("Directory", {
 });
 
 // CLI
+container.register("Cli", {
+  useClass: AppCli,
+});
 container.register("Program", {
   useClass: CommandProgram,
 });
 
-// Project Stages
+// Project
+container.register("Project", {
+  useClass: PpvProject,
+});
+container.register("ProjectStagesRegistry", {
+  useFactory: (dependencyContainer) => {
+    return new ProjectStagesRegistry(dependencyContainer);
+  },
+});
+container.register("ProjectSettingsFactory", {
+  useFactory: (dependencyContainer) => {
+    return (options: ProjectOptions) => {
+      const settings = new PpvProjectSettings(options);
+      dependencyContainer.register("ProjectSettings", {
+        useValue: settings,
+      });
+      return settings;
+    };
+  },
+});
+container.register("StagesProcessor", {
+  useClass: ProjectStagesProcessor,
+});
 
 export { container };

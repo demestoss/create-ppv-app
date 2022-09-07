@@ -3,7 +3,7 @@ import fs from "fs-extra";
 import path from "path";
 import type { Directory } from "../project/directory";
 import type { ProjectSettings } from "../project/projectSettings";
-import type { Stage } from "../project/project";
+import type { Stage } from "../project/stagesProcessor";
 
 @injectable()
 class CopyLockFileStage implements Stage {

@@ -1,4 +1,4 @@
-import { AppLogger } from "../logger";
+import { ConsoleLogger } from "../logger";
 import { AppSpinner } from "../spinner";
 import { AppCli } from "./cli";
 
@@ -39,7 +39,7 @@ class MockedCli {
   }
 
   async proceed() {
-    const logger = new AppLogger();
+    const logger = new ConsoleLogger();
     const spinner = new AppSpinner();
     return new AppCli(logger, spinner, this.buildEnv()).proceed(this.buildArgv());
   }

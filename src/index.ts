@@ -1,39 +1,29 @@
 #!/usr/bin/env node
 import "reflect-metadata";
 import { inject, injectable } from "tsyringe";
-import type { Logger } from "./logger";
-import { AppCli } from "./cli/cli";
-import { Project } from "./project/project";
 import { container } from "./container";
-import { PpvProjectSettings } from "./project/projectSettings";
-import { ProjectStagesRegister } from "./project/projectStagesRegister";
+import type { Project } from "./project/project";
+import type { Logger } from "./logger";
+import type { Cli } from "./cli/cli";
 
 @injectable()
 class Bootstrap {
-  constructor(@inject("Logger") private readonly logger: Logger) {}
+  constructor(
+    @inject("Logger") private readonly logger: Logger,
+    @inject("Cli") private readonly cli: Cli,
+    @inject("Project") private readonly project: Project
+  ) {}
 
-  async main() {
+  async main(argv: string[]) {
     try {
-      await this.run();
+      const projectOptions = await this.cli.proceed(argv);
+      await this.project.create(projectOptions);
+
       process.exit(0);
     } catch (e) {
       this.handleError(e);
       process.exit(1);
     }
-  }
-
-  private async run() {
-    const cli = container.resolve(AppCli);
-    const cliOptions = await cli.proceed(process.argv);
-
-    const projectSettings = new PpvProjectSettings(cliOptions);
-    container.register("ProjectSettings", { useValue: projectSettings });
-
-    const projectStagesRegister = new ProjectStagesRegister(container);
-    projectStagesRegister.register(cliOptions);
-
-    const project = container.resolve(Project);
-    await project.proceedStages();
   }
 
   private handleError(e: unknown) {
@@ -47,4 +37,4 @@ class Bootstrap {
   }
 }
 
-container.resolve(Bootstrap).main();
+container.resolve(Bootstrap).main(process.argv);

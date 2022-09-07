@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { execAsync } from "../utils";
-import { Stage } from "../project/project";
+import { Stage } from "../project/stagesProcessor";
 import { inject, injectable } from "tsyringe";
 import type { Logger } from "../logger";
 import type { Spinner } from "../spinner";

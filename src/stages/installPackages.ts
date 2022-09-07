@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import type { Stage } from "../project/project";
+import type { Stage } from "../project/stagesProcessor";
 import type { Logger } from "../logger";
 import type { Spinner } from "../spinner";
 import type { ProjectSettings } from "../project/projectSettings";

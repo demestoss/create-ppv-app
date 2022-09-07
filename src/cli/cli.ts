@@ -2,11 +2,11 @@ import { inject, injectable } from "tsyringe";
 import { NameProcessor } from "./processor";
 import type { Program } from "./program";
 import type { Environment } from "./environment";
-import type { CliOptions } from "../project/project";
+import type { ProjectOptions } from "../project/project";
 import type { Logger } from "../logger";
 
 interface Cli {
-  proceed(argv: string[]): Promise<CliOptions>;
+  proceed(argv: string[]): Promise<ProjectOptions>;
 }
 
 @injectable()
@@ -21,7 +21,7 @@ class AppCli implements Cli {
     this.name = new NameProcessor();
   }
 
-  async proceed(argv: string[]): Promise<CliOptions> {
+  async proceed(argv: string[]): Promise<ProjectOptions> {
     this.logger.success("Welcome to create-ppv app!");
 
     const options = this.program.parse(argv);
@@ -36,3 +36,4 @@ class AppCli implements Cli {
 }
 
 export { AppCli };
+export type { Cli };
