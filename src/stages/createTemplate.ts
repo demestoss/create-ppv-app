@@ -2,7 +2,7 @@ import { inject, injectable } from "tsyringe";
 import fs from "fs-extra";
 import path from "path";
 import inquirer from "inquirer";
-import type { Stage } from "../project/stagesProcessor";
+import type { Stage } from "../project/commandProcessor";
 import type { Logger } from "../logger";
 import type { Spinner } from "../spinner";
 import type { Directory } from "../project/directory";
@@ -19,9 +19,10 @@ class CreateTemplateStage implements Stage {
   ) {}
 
   async proceed(settings: ProjectSettings) {
-    this.name = settings.name;
     this.logger.info(`\nUsing manager: ${this.logger.infoBold(settings.packageManager.name)}\n`);
     this.spinner.start(`Creating template in: ${this.formattedName}...`);
+
+    this.name = settings.name;
 
     await this.checkIfExists(settings.dir);
     await this.copyFiles(settings.dir);

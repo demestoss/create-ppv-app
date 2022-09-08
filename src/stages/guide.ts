@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import type { Logger } from "../logger";
 import type { ProjectSettings } from "../project/projectSettings";
-import type { Stage } from "../project/stagesProcessor";
+import type { Stage } from "../project/commandProcessor";
 
 @injectable()
 class GuideStage implements Stage {

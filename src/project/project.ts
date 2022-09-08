@@ -1,8 +1,7 @@
 import { inject, injectable } from "tsyringe";
-import { container } from "../container";
-import type { StagesRegistry } from "./projectStagesRegistry";
-import type { StagesProcessor } from "./stagesProcessor";
-import type { ProjectSettings } from "./projectSettings";
+import { ProjectSettings } from "./projectSettings";
+import { ProjectStagesRegistry } from "./projectStagesRegistry";
+import type { IProcessor } from "./commandProcessor";
 
 interface ProjectOptions {
   name: string;
@@ -17,19 +16,13 @@ interface Project {
 
 @injectable()
 class PpvProject implements Project {
-  constructor(
-    @inject("ProjectStagesRegistry") private readonly registry: StagesRegistry,
-    @inject("ProjectSettingsFactory")
-    private readonly projectSettingsFactory: (o: ProjectOptions) => ProjectSettings
-  ) {}
+  constructor(@inject("CommandProcessor") private readonly processor: IProcessor) {}
 
   async create(options: ProjectOptions) {
-    // register in container
-    this.registry.registerStages(options);
-    const processor = container.resolve<StagesProcessor>("StagesProcessor");
+    const settings = new ProjectSettings(options);
+    const registry = new ProjectStagesRegistry(options, settings);
 
-    const settings = this.projectSettingsFactory(options);
-    await processor.proceed(settings);
+    await this.processor.proceed(registry);
   }
 }
 

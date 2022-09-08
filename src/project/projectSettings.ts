@@ -2,13 +2,7 @@ import path from "path";
 import { ProjectOptions } from "./project";
 import { PackageManager, PackageManagerFactory } from "../packageManager";
 
-interface ProjectSettings {
-  readonly name: string;
-  readonly dir: string;
-  readonly packageManager: PackageManager;
-}
-
-class PpvProjectSettings implements ProjectSettings {
+class ProjectSettings {
   readonly name: string;
   readonly dir: string;
   readonly packageManager: PackageManager;
@@ -20,5 +14,4 @@ class PpvProjectSettings implements ProjectSettings {
   }
 }
 
-export { PpvProjectSettings };
-export type { ProjectSettings };
+export { ProjectSettings };

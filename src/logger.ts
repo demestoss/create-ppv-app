@@ -1,5 +1,5 @@
-import chalk from "chalk";
 import { singleton } from "tsyringe";
+import chalk from "chalk";
 
 interface Logger {
   error(...args: unknown[]): void;

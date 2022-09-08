@@ -1,51 +1,44 @@
-import { ClassProvider, DependencyContainer } from "tsyringe";
 import type { ProjectOptions } from "./project";
-import { CreateTemplateStage } from "../stages/createTemplate";
-import { UpdatePackagesStage } from "../stages/updatePackages";
-import { InstallPackagesStage } from "../stages/installPackages";
-import { GitStage } from "../stages/git";
-import { GuideStage } from "../stages/guide";
-import { CopyLockFileStage } from "../stages/copyLockFile";
+import { ICommand } from "../commands/command";
+import { GitInitCommand, TestCommand } from "../commands/gitInitCommand";
+import type { ProjectSettings } from "./projectSettings";
 
-interface StagesRegistry {
-  registerStages(options: ProjectOptions): void;
-}
+class ProjectStagesRegistry {
+  readonly commands: ICommand[] = [];
 
-class ProjectStagesRegistry implements StagesRegistry {
-  constructor(private readonly container: DependencyContainer) {}
-
-  registerStages(options: ProjectOptions) {
-    this.register({
-      useClass: CreateTemplateStage,
-    });
-    this.register({
-      useClass: UpdatePackagesStage,
-    });
-    this.register({
-      useClass: CopyLockFileStage,
-    });
-
-    if (options.install) {
-      this.register({
-        useClass: InstallPackagesStage,
-      });
-    }
-
-    if (options.git) {
-      this.register({
-        useClass: GitStage,
-      });
-    }
-
-    this.register({
-      useClass: GuideStage,
-    });
+  constructor(
+    private readonly options: ProjectOptions,
+    private readonly settings: ProjectSettings
+  ) {
+    this.registerStages();
   }
 
-  private register<T>(provider: ClassProvider<T>) {
-    this.container.register("ProjectStage", provider);
+  private registerStages() {
+    // this.register({
+    //   useClass: CreateTemplateStage,
+    // });
+    // this.register({
+    //   useClass: UpdatePackagesStage,
+    // });
+    // this.register({
+    //   useClass: CopyLockFileStage,
+    // });
+    //
+    // if (options.install) {
+    //   this.register({
+    //     useClass: InstallPackagesStage,
+    //   });
+    // }
+    this.commands.push(new TestCommand());
+
+    if (this.options.git) {
+      this.commands.push(new GitInitCommand(this.settings.dir));
+    }
+
+    // this.register({
+    //   useClass: GuideStage,
+    // });
   }
 }
 
 export { ProjectStagesRegistry };
-export type { StagesRegistry };
