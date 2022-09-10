@@ -1,10 +1,10 @@
 import type { ProjectOptions } from "./project";
-import { ICommand } from "../commands/command";
-import { GitInitCommand, TestCommand } from "../commands/gitInitCommand";
+import { StageCommand } from "../stage/command";
+import { GitInitCommand, TestCommand } from "../stage/gitInitCommand";
 import type { ProjectSettings } from "./projectSettings";
 
 class ProjectStagesRegistry {
-  readonly commands: ICommand[] = [];
+  readonly commands: StageCommand[] = [];
 
   constructor(
     private readonly options: ProjectOptions,

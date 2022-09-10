@@ -1,21 +1,16 @@
 import { inject, injectable } from "tsyringe";
 import type { Logger } from "../logger";
 import type { Spinner } from "../spinner";
-import type { ICommand, ICommandHandler } from "./command";
+import type { StageCommand, StageCommandHandler } from "./command";
 import { execAsync } from "../utils";
-import chalk from "chalk";
 
-class GitInitCommand implements ICommand {
+class GitInitCommand implements StageCommand {
   constructor(public readonly dir: string) {}
 }
 
 @injectable()
-class GitInitCommandHandler implements ICommandHandler<GitInitCommand> {
-  constructor(@inject("Spinner") protected readonly spinner: Spinner) {}
-
+class GitInitCommandHandler implements StageCommandHandler<GitInitCommand> {
   async handle(command: GitInitCommand) {
-    // this.spinner.start("Creating a new git repo...");
-    // try {
     //   let initCmd = "git init --initial-branch=master";
     //   const { stdout: gitVersionOutput } = await execAsync("git --version");
     //   const gitVersionTag = gitVersionOutput.split(" ")[2];
@@ -25,19 +20,13 @@ class GitInitCommandHandler implements ICommandHandler<GitInitCommand> {
     //     initCmd = "git init && git branch -m master";
     //   }
     //   await execAsync(initCmd, { cwd: command.dir });
-    //   this.spinner.succeed(`${chalk.green("Successfully initialized")} ${chalk.green.bold("git")}`);
-    // } catch (error) {
-    //   this.spinner.fail(
-    //     `${chalk.bold.red("Failed:")} could not initialize git. Update git to the latest version!`
-    //   );
-    // }
   }
 }
 
-class TestCommand implements ICommand {}
+class TestCommand implements StageCommand {}
 
 @injectable()
-class TestCommandHandler implements ICommandHandler<GitInitCommand> {
+class TestCommandHandler implements StageCommandHandler<GitInitCommand> {
   constructor(
     @inject("Logger") protected readonly logger: Logger,
     @inject("Spinner") protected readonly spinner: Spinner

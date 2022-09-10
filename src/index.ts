@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import "reflect-metadata";
 import { inject, injectable } from "tsyringe";
-import { container } from "./container";
+import { container } from "./container/container";
 import type { Project } from "./project/project";
 import type { Logger } from "./logger";
 import type { Cli } from "./cli/cli";
